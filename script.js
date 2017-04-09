@@ -37,11 +37,14 @@ const keys = {
 	rightArrow: 39,
 	downArrow: 40
 };
-
 function startGame() {
-	thecircle = new charConstructor(30, 30, 25, "blue");
+	thecircle = new charConstructor();
 	soundsettings();
 	gameArea.start();
+}
+var timeInSecounds = 0;
+function timecounter() {
+	timeInSecounds++;
 }
 var gameArea = {
 	width: 1300,
@@ -54,31 +57,29 @@ var gameArea = {
 		document.body.insertBefore(this.canvas, document.body.childNodes[0]);
 		this.framecounter = 0;
 		this.interval = setInterval(updateGameArea, 1000 / settings.fps);
-		window.addEventListener("keydown", function (e) {
+		window.addEventListener("keydown", function (pressed) {
 			gameArea.keys = gameArea.keys || [];
-			gameArea.keys[e.keyCode] = true;
+			gameArea.keys[pressed.keyCode] = true;
 		});
-		window.addEventListener("keyup", function (e) {
-			gameArea.keys[e.keyCode] = false;
+		window.addEventListener("keyup", function (pressed) {
+			gameArea.keys[pressed.keyCode] = false;
 		});
+		this.time = setInterval(timecounter, 1000);
 	},
 	clear: function () {
 		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	},
 	stop: function () {
 		clearInterval(this.interval);
-	},
-	time: function () {
-		return Math.round(gameArea.framecounter / 25);
 	}
 };
-function charConstructor(x, y, width, color) {
-	this.width = width;
-	this.radius = width / 2;
-	this.speedY = 1;
-	this.speedX = 0;
-	this.x = x;
-	this.y = y;
+function charConstructor() {	
+	this.x = 30;
+	this.y = 30;
+	this.width = 25;
+	this.radius = this.width / 2;
+	this.speedY = 0;
+	this.speedX = 0;	
 	this.health = 3;
 	this.update = function () {
 		var ctx = gameArea.context;
@@ -118,7 +119,7 @@ function charConstructor(x, y, width, color) {
 		var otherleft = otherobj.x;
 		var otherright = otherobj.x + otherobj.width;
 		var othertop = otherobj.y;
-		// is over
+		// is above
 		if (myright > otherleft && myleft < otherright && mybottom < othertop) {
 			// passes in next frame
 			if (mybottom + this.speedY >= othertop) {
@@ -142,7 +143,7 @@ function landConstructor() {
 		gradient.addColorStop(0, "rgba(0, 150, 0, 1)");
 		gradient.addColorStop(1, "rgba(0, 120, 0, 1)");
 		ctx.fillStyle = gradient;
-		ctx.fillRect(this.x, this.y, this.width, this.height);	// this.speedX = -1 * settings.scrollspeed;
+		ctx.fillRect(this.x, this.y, this.width, this.height);
 	};
 	this.newPos = function () {
 		this.x += this.speedX;
@@ -156,7 +157,7 @@ function objConstructor() {
 	this.speedX = -1 * random(7, 10) / 10 * settings.scrollspeed;
 	this.x = gameArea.width;
 	this.y = random(50, gameArea.height - 50);
-	var myArray = [
+	var objectRatio = [
 		1,
 		1,
 		1,
@@ -164,21 +165,17 @@ function objConstructor() {
 		1,
 		2
 	];
-	var rand = myArray[Math.floor(Math.random() * myArray.length)];
+	var rand = objectRatio[Math.floor(Math.random() * objectRatio.length)];
 	this.type = rand;
-	// marians alternative
-	// var myArray = [1,1,2];    
-	// var rand = myArray[Math.floor(Math.random() * myArray.length)];
 	this.update = function () {
-		var ctx;
-		ctx = gameArea.context;
+		var ctx = gameArea.context;
 		if (this.type === 1) {
 			ctx.fillStyle = "black";
 		}
 		if (this.type === 2) {
 			ctx.fillStyle = "red";
 		}
-		ctx.fillRect(this.x, this.y, this.width, this.height);	// this.speedX = -1 * (random(7, 10)) / 10 * settings.scrollspeed;
+		ctx.fillRect(this.x, this.y, this.width, this.height);
 	};
 	this.newPos = function () {
 		this.x += this.speedX;
@@ -198,7 +195,7 @@ function backgroundConstructor() {
 		gradient.addColorStop(0, "rgba(255, 199, 0, 0.700)");
 		gradient.addColorStop(1, "rgba(255, 042, 0, 0.700)");
 		ctx.fillStyle = gradient;
-		ctx.fillRect(this.x, this.y, this.width, this.height);	//this.speedX = -1 * settings.backgroundscrollfactor * settings.scrollspeed;
+		ctx.fillRect(this.x, this.y, this.width, this.height);	
 	};
 	this.newPos = function () {
 		this.x += this.speedX;
@@ -270,7 +267,6 @@ function move() {
 			singlejump = true;
 			gameArea.keys[keys.upArrow] = false;
 			sound.jump.play();
-			updateDifficulty();
 		}
 	}
 	// double jump
@@ -291,14 +287,7 @@ function updateGameArea() {
 	updateCharacter();
 	updateCoordinates();
 	updateCrash();
-	updateInterface();	/*
-    if(gameArea.time > 20){
-        updateDifficulty();
-        updateDifficulty();
-        updateDifficulty();
-        updateDifficulty();
-    }
-    */
+	updateInterface();
 }
 function updateBackground() {
 	if (gameArea.framecounter % settings.rate.background === 0) {
@@ -380,30 +369,24 @@ function updateInterface() {
 	ctx.fillStyle = "black";
 	ctx.textAlign = "center";
 	ctx.fillText("Health: " + thecircle.health, gameArea.width / 2, 50);
-	ctx.fillText("Time: " + gameArea.time(), gameArea.width / 2, 100);
-}
-function updateDifficulty() {
-	settings.difficulty += 1;
-	// settings.scrollspeed = settings.scrollspeed * settings.difficulty;
-	// settings.rate.objects = settings.rate.objects - 20 * settings.difficulty);
+	ctx.fillText("Time: " + timeInSecounds, gameArea.width / 2, 100);
 }
 // help functions
 function random(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-function soundsettings(){
+function soundsettings() {
 	sound.music.volume = settings.soundlevel;
 	sound.music.loop = true;
 	sound.music.play();
 	sound.jump.volume = settings.soundlevel;
 	sound.doublejump.volume = settings.soundlevel;
 	sound.gameover.volume = settings.soundlevel;
-}
-// =============================================================================
-// =============================================================================
-// =============================================================================
+}	/*
+============================================================================
+============================================================================
+============================================================================
 
-  /*
 =========
 BAUSTELLE
 =========
@@ -415,8 +398,6 @@ var objects =
     [3,             "PowerUp,    1,        jump speed bonus for some frames]
 ]
 
-*/
-  /*
 ==========
 T0 D0 LIST
 ==========
