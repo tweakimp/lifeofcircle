@@ -1,0 +1,21 @@
+canvas {
+  border: 1px solid #c1c1c1;
+  background-color: #e2e2e2;
+  width: 1000px;
+  height 600x;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -300px 0 0 -500px;
+}
+
+div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -300px 0 0 -500px;
+}
+
+body {
+  background-color: #d1d1d1;
+}
