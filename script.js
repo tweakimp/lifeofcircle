@@ -382,7 +382,9 @@ function soundsettings() {
 	sound.jump.volume = settings.soundlevel;
 	sound.doublejump.volume = settings.soundlevel;
 	sound.gameover.volume = settings.soundlevel;
-}	/*
+}
+
+/*
 ============================================================================
 ============================================================================
 ============================================================================
@@ -402,6 +404,14 @@ var objects =
 T0 D0 LIST
 ==========
 
+spielbar machen
+- punkte für vergangene frames
+- restart button
+
+optional
+
+- 
+
 KNOWN ISSUES
  - Man kann nicht unterhalb vom Landscape landen (?)
  - update Funktionen in Anzahl Objekte / Frame umschreiben
@@ -411,9 +421,10 @@ FEATURES
  - Hintergrund erzeugen, bevor das Spiel beginnt
  - Schwierigkeitsgrade erhöhen (Geschwindigkeit?)
     - Difficulty durch Geschwindigkeit
-    - Difficulty durch mehr Objects
-- restart button
-- music function
+    - Difficulty, lautstärker bzw an/aus durch mehr Objects
+
+
+- highscore auf server speichern
 
 
 ERLEDIGT
@@ -424,5 +435,6 @@ ERLEDIGT
 - obstacles in objects umbenennen
 - Sounds 
 - Ingame Zeit anzeigen
+- music function
 
 */
