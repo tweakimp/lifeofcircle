@@ -1,6 +1,6 @@
 // jshint esversion:6
 // jshint browser: true
-// test for marian
+// test for JUSTICE
 var thecircle;
 var objects = [];
 var landscape = [];
@@ -75,7 +75,8 @@ var gameArea = {
 		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	},
 	stop: function () {
-		clearInterval(this.interval);
+        clearInterval(this.interval);
+		this.restart = setInterval(restartGame, 1000 / settings.fps);  
 	}
 };
 
@@ -371,6 +372,9 @@ function updateCrash() {
 					sound.music.pause();
 					sound.gameover.play();
 					gameArea.stop();
+                    document.getElementById("button").style.display="block";
+					
+					
 				}
 			}
 			if(thecircle.crashWith(objects[i]) && objects[i].type === 2) {
@@ -390,6 +394,7 @@ function updateInterface() {
 	ctx.fillText("Time: " + timeInSecounds, gameArea.width / 2, 100);
 }
 
+        document.getElementById("button").style.display="none";
 function restartGame() {
 	if(gameArea.keys && gameArea.keys[keys.rKey]) {
 		//reset game
@@ -404,7 +409,9 @@ function restartGame() {
 		surface = undefined;
 		isLanded = undefined;
 		timeInSecounds = 0;
-		settings = {
+        sound.music.currentTime = 0;
+        settings = {
+			soundlevel: 0.2,
 			movingspeed: 5,
 			jumpspeed: 10,
 			fallspeed: 0.3,
@@ -419,9 +426,52 @@ function restartGame() {
 				objects: 200
 			}
 		};
+        clearInterval(gameArea.restart);
+        clearInterval(gameArea.interval);
+		clearInterval(gameArea.time);
 		startGame();
+		document.getElementById("button").style.display="none";
 	}
+   
 }
+
+function buttonRestart(){
+    gameArea.clear();
+	thecircle = undefined;
+	objects = [];
+	landscape = [];
+	background = [];
+	inAir = true;
+	singlejump = false;
+	doublejump = false;
+	surface = undefined;
+	isLanded = undefined;
+	timeInSecounds = 0;
+    sound.music.currentTime = 0;
+    settings = {
+			soundlevel: 0.2,
+			movingspeed: 5,
+			jumpspeed: 10,
+			fallspeed: 0.3,
+			scrollspeed: 1,
+			backgroundscrollfactor: 0.5,
+			fps: 120,
+			crash: true,
+			difficulty: 1,
+			rate: {
+				landscape: 275,
+				background: 130,
+				objects: 200
+			}
+		};
+        clearInterval(gameArea.restart);
+        clearInterval(gameArea.interval);
+		clearInterval(gameArea.time);
+		startGame();
+		document.getElementById("button").style.display="none";
+}
+
+
 // help functions
 function random(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -435,6 +485,8 @@ function soundsettings() {
 	sound.doublejump.volume = settings.soundlevel;
 	sound.gameover.volume = settings.soundlevel;
 }
+
+
 /*
 ============================================================================
 ============================================================================

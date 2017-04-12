@@ -2,7 +2,7 @@ canvas {
   border: 1px solid #c1c1c1;
   background-color: #e2e2e2;
   width: 1000px;
-  height 600x;
+  height: 600px;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -18,4 +18,15 @@ div {
 
 body {
   background-color: #d1d1d1;
+}
+
+#button {
+    display:none;
+}
+
+#musik {
+    background-image:url(http://borussiamuenster.de/tweakimp/tloc/note.png/28x35);
+    font-size:0;
+    width:50px;
+    height:50px;
 }
