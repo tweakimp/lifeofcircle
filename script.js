@@ -1,5 +1,6 @@
 // jshint esversion:6
 // jshint browser: true
+// test for marian
 var thecircle;
 var objects = [];
 var landscape = [];
@@ -9,6 +10,7 @@ var singlejump = false;
 var doublejump = false;
 var surface;
 var isLanded;
+var timeInSecounds = 0;
 var settings = {
 	soundlevel: 0.2,
 	movingspeed: 5,
@@ -35,14 +37,17 @@ const keys = {
 	leftArrow: 37,
 	upArrow: 38,
 	rightArrow: 39,
-	downArrow: 40
+	downArrow: 40,
+	rKey: 82
 };
+
 function startGame() {
 	thecircle = new charConstructor();
 	soundsettings();
 	gameArea.start();
 }
-var timeInSecounds = 0;
+
+
 function timecounter() {
 	timeInSecounds++;
 }
@@ -73,13 +78,14 @@ var gameArea = {
 		clearInterval(this.interval);
 	}
 };
-function charConstructor() {	
+
+function charConstructor() {
 	this.x = 30;
 	this.y = 30;
 	this.width = 25;
 	this.radius = this.width / 2;
 	this.speedY = 0;
-	this.speedX = 0;	
+	this.speedX = 0;
 	this.health = 3;
 	this.update = function () {
 		var ctx = gameArea.context;
@@ -106,8 +112,7 @@ function charConstructor() {
 		var othertop = otherobj.y;
 		var otherbottom = otherobj.y + otherobj.height;
 		var crash = true;
-		if (mybottom < othertop || mytop > otherbottom	/* drunter */ || myright < otherleft	/* links */ || myleft > otherright) {
-			/* rechts */
+		if(mybottom < othertop || mytop > otherbottom /* drunter */ || myright < otherleft /* links */ || myleft > otherright) /* rechts */ {
 			crash = false;
 		}
 		return crash;
@@ -120,9 +125,9 @@ function charConstructor() {
 		var otherright = otherobj.x + otherobj.width;
 		var othertop = otherobj.y;
 		// is above
-		if (myright > otherleft && myleft < otherright && mybottom < othertop) {
-			// passes in next frame
-			if (mybottom + this.speedY >= othertop) {
+		if(myright > otherleft && myleft < otherright && mybottom < othertop) {
+			// would pass through in next frame
+			if(mybottom + this.speedY >= othertop) {
 				return true;
 			}
 		} else {
@@ -130,6 +135,7 @@ function charConstructor() {
 		}
 	};
 }
+
 function landConstructor() {
 	this.width = 250;
 	this.height = random(50, gameArea.height / 2);
@@ -150,6 +156,7 @@ function landConstructor() {
 		this.y += this.speedY;
 	};
 }
+
 function objConstructor() {
 	this.width = 30;
 	this.height = 30;
@@ -169,10 +176,10 @@ function objConstructor() {
 	this.type = rand;
 	this.update = function () {
 		var ctx = gameArea.context;
-		if (this.type === 1) {
+		if(this.type === 1) {
 			ctx.fillStyle = "black";
 		}
-		if (this.type === 2) {
+		if(this.type === 2) {
 			ctx.fillStyle = "red";
 		}
 		ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -182,6 +189,7 @@ function objConstructor() {
 		this.y += this.speedY;
 	};
 }
+
 function backgroundConstructor() {
 	this.width = 75;
 	this.height = random(50, gameArea.height - 50);
@@ -195,18 +203,19 @@ function backgroundConstructor() {
 		gradient.addColorStop(0, "rgba(255, 199, 0, 0.700)");
 		gradient.addColorStop(1, "rgba(255, 042, 0, 0.700)");
 		ctx.fillStyle = gradient;
-		ctx.fillRect(this.x, this.y, this.width, this.height);	
+		ctx.fillRect(this.x, this.y, this.width, this.height);
 	};
 	this.newPos = function () {
 		this.x += this.speedX;
 		this.y += this.speedY;
 	};
 }
+
 function move() {
 	// move left
-	if (gameArea.keys && gameArea.keys[keys.leftArrow]) {
+	if(gameArea.keys && gameArea.keys[keys.leftArrow]) {
 		// left border
-		if (thecircle.x <= thecircle.radius) {
+		if(thecircle.x <= thecircle.radius) {
 			thecircle.speedX = 0;
 			thecircle.x = thecircle.radius;
 		} else {
@@ -214,9 +223,9 @@ function move() {
 		}
 	}
 	// move right
-	if (gameArea.keys && gameArea.keys[keys.rightArrow]) {
+	if(gameArea.keys && gameArea.keys[keys.rightArrow]) {
 		// right border
-		if (thecircle.x >= gameArea.width - thecircle.radius) {
+		if(thecircle.x >= gameArea.width - thecircle.radius) {
 			thecircle.speedX = 0;
 			thecircle.x = gameArea.width - thecircle.radius;
 		} else {
@@ -224,11 +233,11 @@ function move() {
 		}
 	}
 	// in air
-	if (inAir === true) {
+	if(inAir === true) {
 		// apply gravity
 		thecircle.speedY += settings.fallspeed;
 		// land on ground
-		if (thecircle.y + thecircle.radius > gameArea.height) {
+		if(thecircle.y + thecircle.radius > gameArea.height) {
 			thecircle.y = gameArea.height - thecircle.radius;
 			thecircle.speedY = 0;
 			inAir = false;
@@ -237,10 +246,10 @@ function move() {
 			doublejump = false;
 		}
 		// land on landscape
-		if (thecircle.speedY > 0) {
+		if(thecircle.speedY > 0) {
 			var land;
-			for (land of landscape) {
-				if (thecircle.landOn(land)) {
+			for(land of landscape) {
+				if(thecircle.landOn(land)) {
 					thecircle.y = gameArea.height - thecircle.radius - land.height;
 					thecircle.speedY = 0;
 					inAir = false;
@@ -254,14 +263,14 @@ function move() {
 		}
 	}
 	// falling off landscape
-	if (isLanded === true && (thecircle.x < surface.x || thecircle.x > surface.x + surface.width)) {
+	if(isLanded === true && (thecircle.x < surface.x || thecircle.x > surface.x + surface.width)) {
 		thecircle.speedY = thecircle.speedY + settings.fallspeed;
 		inAir = true;
 		isLanded = false;
 	}
 	// single jump
-	if (gameArea.keys && gameArea.keys[keys.upArrow]) {
-		if (singlejump === false && inAir === false) {
+	if(gameArea.keys && gameArea.keys[keys.upArrow]) {
+		if(singlejump === false && inAir === false) {
 			thecircle.speedY = -1 * settings.jumpspeed;
 			inAir = true;
 			singlejump = true;
@@ -270,14 +279,15 @@ function move() {
 		}
 	}
 	// double jump
-	if (gameArea.keys && gameArea.keys[keys.upArrow]) {
-		if (singlejump === true && inAir === true && doublejump === false) {
+	if(gameArea.keys && gameArea.keys[keys.upArrow]) {
+		if(singlejump === true && inAir === true && doublejump === false) {
 			thecircle.speedY = -1 * settings.jumpspeed;
 			doublejump = true;
 			sound.doublejump.play();
 		}
 	}
 }
+
 function updateGameArea() {
 	gameArea.clear();
 	gameArea.framecounter++;
@@ -288,64 +298,71 @@ function updateGameArea() {
 	updateCoordinates();
 	updateCrash();
 	updateInterface();
+	restartGame();
 }
+
 function updateBackground() {
-	if (gameArea.framecounter % settings.rate.background === 0) {
+	if(gameArea.framecounter % settings.rate.background === 0) {
 		background.push(new backgroundConstructor());
 	}
-	for (var i = 0; i < background.length; i++) {
+	for(var i = 0; i < background.length; i++) {
 		background[i].newPos();
 		// delete background that is out of game area
-		if (background[i].x + background[i].width < 0) {
+		if(background[i].x + background[i].width < 0) {
 			background.splice(i, 1);
 		}
 		background[i].update();
 	}
 }
+
 function updateLandscape() {
-	if (gameArea.framecounter % settings.rate.landscape === 0) {
+	if(gameArea.framecounter % settings.rate.landscape === 0) {
 		landscape.push(new landConstructor());
 	}
-	for (var i = 0; i < landscape.length; i++) {
+	for(var i = 0; i < landscape.length; i++) {
 		landscape[i].newPos();
 		// delete landscape that is out of game area
-		if (landscape[i].x + landscape[i].width < 0) {
+		if(landscape[i].x + landscape[i].width < 0) {
 			landscape.splice(i, 1);
 		}
 		landscape[i].update();
 	}
 }
+
 function updateObjects() {
-	if (gameArea.framecounter % settings.rate.objects === 0) {
+	if(gameArea.framecounter % settings.rate.objects === 0) {
 		objects.push(new objConstructor());
 	}
-	for (var i = 0; i < objects.length; i++) {
+	for(var i = 0; i < objects.length; i++) {
 		objects[i].newPos();
 		// delete objects that are out of game area
-		if (objects[i].x + objects[i].width < 0) {
+		if(objects[i].x + objects[i].width < 0) {
 			objects.splice(i, 1);
 		}
 		objects[i].update();
 	}
 }
+
 function updateCharacter() {
 	thecircle.speedX = 0;
 	move();
 	thecircle.newPos();
 	thecircle.update();
 }
+
 function updateCoordinates() {
 	var ctx = gameArea.context;
 	ctx.font = "30px Arial";
 	ctx.fillText(Math.round(thecircle.x) + ", " + Math.round(thecircle.y), 200, 50);
 }
+
 function updateCrash() {
-	if (settings.crash) {
-		for (var i = 0; i < objects.length; i++) {
-			if (thecircle.crashWith(objects[i]) && objects[i].type === 1) {
+	if(settings.crash) {
+		for(var i = 0; i < objects.length; i++) {
+			if(thecircle.crashWith(objects[i]) && objects[i].type === 1) {
 				objects.splice(i, 1);
 				thecircle.health--;
-				if (thecircle.health === 0) {
+				if(thecircle.health === 0) {
 					var ctx = gameArea.context;
 					ctx.font = "normal 60px Impact";
 					ctx.fillStyle = "black";
@@ -356,13 +373,14 @@ function updateCrash() {
 					gameArea.stop();
 				}
 			}
-			if (thecircle.crashWith(objects[i]) && objects[i].type === 2) {
+			if(thecircle.crashWith(objects[i]) && objects[i].type === 2) {
 				objects.splice(i, 1);
 				thecircle.health++;
 			}
 		}
 	}
 }
+
 function updateInterface() {
 	var ctx = gameArea.context;
 	ctx.font = "30px Tahoma";
@@ -371,10 +389,44 @@ function updateInterface() {
 	ctx.fillText("Health: " + thecircle.health, gameArea.width / 2, 50);
 	ctx.fillText("Time: " + timeInSecounds, gameArea.width / 2, 100);
 }
+
+function restartGame() {
+	if(gameArea.keys && gameArea.keys[keys.rKey]) {
+		//reset game
+		gameArea.clear();
+		thecircle = undefined;
+		objects = [];
+		landscape = [];
+		background = [];
+		inAir = true;
+		singlejump = false;
+		doublejump = false;
+		surface = undefined;
+		isLanded = undefined;
+		timeInSecounds = 0;
+		settings = {
+			movingspeed: 5,
+			jumpspeed: 10,
+			fallspeed: 0.3,
+			scrollspeed: 1,
+			backgroundscrollfactor: 0.5,
+			fps: 120,
+			crash: true,
+			difficulty: 1,
+			rate: {
+				landscape: 275,
+				background: 130,
+				objects: 200
+			}
+		};
+		startGame();
+	}
+}
 // help functions
 function random(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 function soundsettings() {
 	sound.music.volume = settings.soundlevel;
 	sound.music.loop = true;
@@ -383,7 +435,6 @@ function soundsettings() {
 	sound.doublejump.volume = settings.soundlevel;
 	sound.gameover.volume = settings.soundlevel;
 }
-
 /*
 ============================================================================
 ============================================================================
@@ -406,27 +457,23 @@ T0 D0 LIST
 
 spielbar machen
 - punkte für vergangene frames
-- restart button
+
+- button für switch zwischen musik+ton / nur ton / aus
 
 optional
-
-- 
+- highscore auf server speichern
 
 KNOWN ISSUES
- - Man kann nicht unterhalb vom Landscape landen (?)
- - update Funktionen in Anzahl Objekte / Frame umschreiben
+- Man kann nicht unterhalb vom Landscape landen (?)
+- update Funktionen in Anzahl Objekte / Frame umschreiben
 
 
 FEATURES
  - Hintergrund erzeugen, bevor das Spiel beginnt
  - Schwierigkeitsgrade erhöhen (Geschwindigkeit?)
     - Difficulty durch Geschwindigkeit
-    - Difficulty, lautstärker bzw an/aus durch mehr Objects
-
-
-- highscore auf server speichern
-
-
+    - Difficulty durch mehr Objects
+   
 ERLEDIGT
 - Lebenspunkte einbauen
 - Anzeige LP
@@ -436,5 +483,6 @@ ERLEDIGT
 - Sounds 
 - Ingame Zeit anzeigen
 - music function
+- restart button
 
 */
